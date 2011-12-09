@@ -1,0 +1,2 @@
+# DATAPATH is the base path to .wea data files.
+DATAPATH = "/tmp"

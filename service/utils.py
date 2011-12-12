@@ -8,12 +8,22 @@ url_map = Map([])
 
 
 def expose(rule, **kw):
-    """Used to decorate a view function."""
+    """Expose a view function at the given URL."""
     def decorate(f):
         kw['endpoint'] = f.__name__
         url_map.add(Rule(rule, **kw))
         return f
     return decorate
+
+
+def require(request, required_args):
+    """Return error message if required_args aren't in request."""
+    failed = []
+    for arg in required_args:
+        if request.args.get(arg, None) is None:
+            failed.append(arg)
+    if failed:
+        return "Arguments required: %s" % ",".join(failed)
 
 
 def JsonResponse(o):

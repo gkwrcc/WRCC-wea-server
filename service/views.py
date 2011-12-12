@@ -2,7 +2,7 @@
 # backend library code.
 
 import datetime
-from utils import url_map, expose, \
+from utils import url_map, expose, require, \
             JsonResponse, ErrorResponse, \
             parse_date
 
@@ -32,21 +32,37 @@ def test_list(request):
     return JsonResponse(result)
 
 
-@expose('/all_native')
-def all_native(request):
-    from libwea.products.listers import all_native
-    stn = request.args.get('stn', None)
-    if stn is None:
-        return ErrorResponse("'stn' argument required.")
-    sD = parse_date(request.args.get('sD', None))
-    if sD is None:
-        return ErrorResponse("'sD' argument required.")
-    eD = parse_date(request.args.get('eD', None))
-    if eD is None:
-        return ErrorResponse("'eD' argument required.")
+@expose('/getData')
+def getData(request):
+    from libwea.products.listers import getData
+    error = require(request, ['stn', 'sD', 'eD'])
+    if error:
+        return ErrorResponse(error)
+
+    stn = request.args.get('stn')
+    sD = parse_date(request.args.get('sD'))
+    eD = parse_date(request.args.get('eD'))
 
     try:
-        result = all_native(stn, sD, eD)
+        result = getData(stn, sD, eD)
+    except IOError:
+        return ErrorResponse("No data available.")
+
+    return JsonResponse(result)
+
+
+@expose('/getDataSingleDay')
+def getDataSingleDay(request):
+    from libwea.products.listers import getDataSingleDay
+    error = require(request, ['stn', 'sD'])
+    if error:
+        return ErrorResponse(error)
+
+    stn = request.args.get('stn')
+    sD = parse_date(request.args.get('sD'))
+
+    try:
+        result = getDataSingleDay(stn, sD)
     except IOError:
         return ErrorResponse("No data available.")
 

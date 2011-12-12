@@ -27,7 +27,7 @@ def test_list(stn, sD, eD, var_list=None):
     return result
 
 
-def all_native(stn, sD, eD):
+def getData(stn, sD, eD):
     """
     Get all elements for a stn in native time interval.
     """
@@ -50,3 +50,14 @@ def all_native(stn, sD, eD):
         result['data'][var] = tuple(w.get_var(var))
 
     return result
+
+
+def getDataSingleDay(stn, sD):
+    """
+    Get all elements for a single day.
+    """
+    # First, calculate ending date
+    sD = sD.replace(hour=0, minute=0)
+    eD = sD.replace(hour=23, minute=59)
+
+    return getData(stn, sD, eD)

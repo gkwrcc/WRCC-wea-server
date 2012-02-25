@@ -4,7 +4,7 @@
 
 import sys
 from numpy import array, zeros
-from utils import days_in_month
+from utils import days_in_month, yearmonth_from_filename
 
 
 class WeaFile(object):
@@ -24,16 +24,7 @@ class WeaFile(object):
         return "<WeaFile %s>" % self.filename
 
     def yearmonth(self):
-        """
-        Determine the year and month based on filename.
-        """
-        m = int(self.filename[-8:][:2])
-        y = int(self.filename[-8:][2:4])
-        if y < 40:
-            y = int("20%02d" % y)
-        else:
-            y = int("19%02d" % y)
-        return (y, m)
+        return yearmonth_from_filename(self.filename)
 
     def _do_unpack(self, fmt, nbytes):
         """

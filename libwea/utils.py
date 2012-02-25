@@ -2,6 +2,7 @@
 # Common utility functions.
 #
 
+import re
 import datetime
 
 
@@ -71,3 +72,27 @@ def get_next_month(date):
         return date.replace(year=date.year + 1, month=1, day=1)
     else:
         return date.replace(month=date.month + 1, day=1)
+
+def yearmonth_from_filename(filename):
+    """
+    Determine the year and month based on filename.
+    """
+    m = int(filename[-8:][:2])
+    y = int(filename[-8:][2:4])
+
+    if y < 40:
+        y = int("20%02d" % y)
+    else:
+        y = int("19%02d" % y)
+    return (y, m)
+
+
+def is_valid_filename(filename, stn_id):
+    """
+    Determine if the given filename is a valid wea data
+    file for this stn_id.
+    """
+    #           stn   valid months                        year   .wea
+    pattern = "^(%s)(01|02|03|04|05|06|07|08|09|10|11|12)(\d\d)(\.wea)$" % stn_id
+    regex = re.compile(pattern)
+    return bool(regex.match(filename))

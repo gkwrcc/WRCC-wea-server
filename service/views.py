@@ -67,3 +67,21 @@ def getDataSingleDay(request):
         return ErrorResponse("No data available.")
 
     return JsonResponse(result)
+
+
+@expose('/getMostRecentData')
+def getMostRecentData(request):
+    from libwea.products.listers import getMostRecentData
+    error = require(request, ['stn'])
+    if error:
+        return ErrorResponse(error)
+
+    stn = request.args.get('stn')
+    eD = parse_date(request.args.get('eD', None))
+
+    try:
+        result = getMostRecentData(stn, eD)
+    except IOError:
+        return ErrorResponse("No data available.")
+
+    return JsonResponse(result)

@@ -22,9 +22,9 @@ class BaseApp(object):
         except NotFound, e:
             response = ErrorResponse("URL Not Found")
             response.status_code = 404
-        except:
-            response = ErrorResponse("Internal Server Error")
-            response.status_code = 500
+        #except:
+        #    response = ErrorResponse("Internal Server Error")
+        #    response.status_code = 500
 
         return response(environ, start_response)
 

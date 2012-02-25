@@ -87,6 +87,17 @@ def yearmonth_from_filename(filename):
     return (y, m)
 
 
+def filename_from_yearmonth(ym, stn_id):
+    """
+    Produce a .wea filename for the year/month tuple ym.
+    """
+    y4 = "%04d" % int(ym[0])
+    y2 = y4[2:]
+    m2 = "%02d" % int(ym[1])
+    stn_id = str(stn_id).lower()
+    return "%s%s%s.wea" % (stn_id, m2, y2)
+
+
 def is_valid_filename(filename, stn_id):
     """
     Determine if the given filename is a valid wea data

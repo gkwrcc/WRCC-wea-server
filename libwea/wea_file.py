@@ -3,6 +3,7 @@
 #
 
 import sys
+import numpy as np
 from numpy import array, zeros
 from utils import days_in_month, yearmonth_from_filename
 
@@ -108,6 +109,20 @@ class WeaFile(object):
         # Now self.data is an array like the output of readwea2.e
         # self.data[:, 2].min(): the min value of column 2 (same as pcodes[2])
         return self.data
+
+    def latest_data(self):
+        """
+        Return a slice of self.data with the most recent, non-missing data.
+        """
+        MISSING = 10000000.0
+        a = self.data  # use a short reference to data array
+        # We want to find the last row of data where
+        # there is a non-missing value, excluding the first two columns,
+        # which are DAY and TIM.
+        ind = np.where(a[:,2:] < MISSING)  # the index where non-missing are
+        last_row = ind[0][-1]
+        data = dict(zip(self.header['pcodes'], a[last_row]))
+        return data
 
 
 if __name__ == '__main__':

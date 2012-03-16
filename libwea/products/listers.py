@@ -2,10 +2,11 @@
 # Functions should return dicts to be json-ized.
 
 import os
+import datetime
 from libwea.wea_array import WeaArray
 from libwea.wea_array import WeaFile
 from libwea.meta import WeaMeta
-from libwea.utils import filename_from_yearmonth
+from libwea.utils import filename_from_yearmonth, datetime_from_DAYTIM
 import settings
 
 
@@ -76,11 +77,19 @@ def getMostRecentData(stn, eD=None):
     stn_meta = WeaMeta(stn)
     if eD is None:
         eD = stn_meta.get_latest_month()
+
     # This may need another level of abstraction?
     fn = filename_from_yearmonth((eD.year, eD.month), stn)
     wea = WeaFile(os.path.join(settings.DATAPATH, stn, fn))
 
     header = wea.header
+    latest_data = wea.latest_data()
+    latest_data_dt = datetime_from_DAYTIM(latest_data["DAY"],
+                        latest_data["TIM"])
+
+    # Use this to return the common format?, but data
+    # will be lists of 1 element, # and datafile is read twice.
+    #return getData(stn, latest_data_dt, latest_data_dt)
 
     result = {
         'stn': stn,
@@ -88,8 +97,8 @@ def getMostRecentData(stn, eD=None):
         'rgt': header['rgt'],
         'fac1': header['fac1'],
         'fac2': header['fac2'],
-        'eD': eD.timetuple()[:5],
-        'data': wea.latest_data(),
+        'eD': latest_data_dt.timetuple()[:5],
+        'data': latest_data
     }
     return result
 

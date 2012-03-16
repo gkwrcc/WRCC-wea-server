@@ -73,6 +73,7 @@ def get_next_month(date):
     else:
         return date.replace(month=date.month + 1, day=1)
 
+
 def yearmonth_from_filename(filename):
     """
     Determine the year and month based on filename.
@@ -104,6 +105,22 @@ def is_valid_filename(filename, stn_id):
     file for this stn_id.
     """
     #           stn   valid months                        year   .wea
-    pattern = "^(%s)(01|02|03|04|05|06|07|08|09|10|11|12)(\d\d)(\.wea)$" % stn_id
+    pattern = "^" + stn_id
+    pattern += "(01|02|03|04|05|06|07|08|09|10|11|12)(\d\d)(\.wea)$"
     regex = re.compile(pattern)
     return bool(regex.match(filename))
+
+
+def datetime_from_DAYTIM(DAY, TIM, year=None):
+    """
+    Return a datetime object equal to Julian day DAY
+    and HHMM TIM.
+    """
+    if year is None:
+        year = datetime.date.today().year
+    ret = datetime.datetime(year, 1, 1) + datetime.timedelta(int(DAY) - 1)
+    HHMM = "%04d" % int(TIM)
+    hour = int(HHMM[:2])
+    minute = int(HHMM[2:])
+    ret = ret.replace(hour=hour, minute=minute)
+    return ret

@@ -84,6 +84,8 @@ class WeaArray(object):
         log.debug("minute diff: %s" % md)
         log.debug("num vals: %s" % num_vals)
 
+        # TODO: Use faster array operations instead of
+        # extending a list
         ret = []
         for f in self.weafiles:
             pcodes = list(f.header['pcodes'])
@@ -104,7 +106,8 @@ class WeaArray(object):
             else:
                 # WHAT TO DO IF pcode DOESN'T EXIST??
                 raise
-        return array(ret)
+        # Convert data to floats for json serialize
+        return array([float(i) for i in ret])
 
 
 if __name__ == '__main__':

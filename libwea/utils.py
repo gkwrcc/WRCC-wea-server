@@ -4,6 +4,7 @@
 
 import re
 import datetime
+from elements import Conversions, WeaElements
 
 
 def round_date(d, mins, up=False):
@@ -124,3 +125,17 @@ def datetime_from_DAYTIM(DAY, TIM, year=None):
     minute = int(HHMM[2:])
     ret = ret.replace(hour=hour, minute=minute)
     return ret
+
+
+def wea_convert(unit, system="E"):
+    """
+    This function returns a tuple (func, units) where:
+    - func is a function to convert the given unit to the given system
+    - units is the units returned by func
+
+    This only works with linear conversions.
+    """
+    if (unit, system) in Conversions:
+        mult, offset, units2 = Conversions[(unit, system)]
+        return (lambda x: (x*mult)+offset, units2)
+    return (None,None)

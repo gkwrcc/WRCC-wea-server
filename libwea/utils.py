@@ -127,7 +127,7 @@ def datetime_from_DAYTIM(DAY, TIM, year=None):
     return ret
 
 
-def wea_convert(unit, system="E"):
+def wea_convert(unit, units_system):
     """
     This function returns a tuple (func, units) where:
     - func is a function to convert the given unit to the given system
@@ -135,18 +135,23 @@ def wea_convert(unit, system="E"):
 
     This only works with linear conversions.
     """
-    if (unit, system) in Conversions:
-        mult, offset, units2 = Conversions[(unit, system)]
+    if (unit, units_system) in Conversions:
+        mult, offset, units2 = Conversions[(unit, units_system)]
         return (lambda x: (x*mult)+offset, units2)
     return (None,None)
 
 
-def get_var_units(pcode):
+def get_var_units(pcode, units_system='N'):
     """
     Return the units for the given pcode.
     """
     try:
         elem = WeaElements[pcode]
+        if units_system == 'N':
+            return elem["units"]
+        conv_f, new_units = wea_convert(elem['units'], units_system)
+        if new_units:
+            return new_units
         return elem["units"]
     except KeyError:
         return None

@@ -34,11 +34,11 @@ def test_list(stn, sD, eD, var_list=None):
     return result
 
 
-def getData(stn, sD, eD):
+def getData(stn, sD, eD, units_system='N'):
     """
     Get all elements for a stn in native time interval.
     """
-    w = WeaArray(stn, sD, eD)
+    w = WeaArray(stn, sD, eD, units_system=units_system)
     header = w.weafiles[-1].header
     var_list = header['pcodes']
 
@@ -56,12 +56,12 @@ def getData(stn, sD, eD):
 
     for var in var_list:
         result['data'][var] = tuple(w.get_var(var))
-        result['units'][var] = get_var_units(var)
+        result['units'][var] = get_var_units(var, units_system=units_system)
 
     return result
 
 
-def getDataSingleDay(stn, sD):
+def getDataSingleDay(stn, sD, units_system='N'):
     """
     Get all elements for a single day.
     """
@@ -69,10 +69,10 @@ def getDataSingleDay(stn, sD):
     sD = sD.replace(hour=0, minute=0)
     eD = sD.replace(hour=23, minute=59)
 
-    return getData(stn, sD, eD)
+    return getData(stn, sD, eD, units_system=units_system)
 
 
-def getMostRecentData(stn, eD=None):
+def getMostRecentData(stn, eD=None, units_system='N'):
     """
     Get all elements for the most recent day of data,
     using eD as the last year/month to search.
@@ -92,6 +92,7 @@ def getMostRecentData(stn, eD=None):
     units = {}
     for pcode in latest_data:
         units[pcode] = get_var_units(pcode)
+        #units[pcode] = get_var_units(pcode, units_system=units_system)  # conversions not yet implemented
 
     # Use this to return the common format?, but data
     # will be lists of 1 element, # and datafile is read twice.

@@ -6,7 +6,8 @@ import logging
 from numpy import array, nan, zeros
 from wea_file import WeaFile
 from elements import WeaElements, Conversions
-from utils import minutes_diff, round_date, get_next_month
+from utils import minutes_diff, round_date, get_next_month, \
+    get_var_units, wea_convert
 
 import settings
 
@@ -17,13 +18,17 @@ class WeaArray(object):
     """
     Class that arranges multiple WeaFile objects into a single array.
     """
-    def __init__(self, stn_id, sD, eD):
+    def __init__(self, stn_id, sD, eD, units_system='N'):
         self.data = None
         self.stn_id = str(stn_id).lower()
         self.sD = sD
         self.eD = eD
+        self.units_system = units_system
         self._make_filenames()
         self._load_full_months()
+
+    def set_units_system(self, new_units_system):
+        self.units_system = new_units_system
 
     def _make_filenames(self):
         "Generate the needed data file names based on months requested."
@@ -62,6 +67,7 @@ class WeaArray(object):
     def get_var(self, pcode, round_start_up=False, round_end_up=False):
         pcode = str(pcode).upper()
         h = self.weafiles[0].header
+        MISSING = 10000000.0  # TODO: Get this from settings?
         for f in self.weafiles:
             assert f.header['oi'] == h['oi']
 
@@ -107,6 +113,21 @@ class WeaArray(object):
             else:
                 # WHAT TO DO IF pcode DOESN'T EXIST??
                 raise
+
+        # Convert units, unless N (native)
+        if self.units_system != 'N':
+            fmt = "%f"
+            try:
+                elem = WeaElements[pcode]
+                fmt = elem['format']
+            except KeyError:
+                elem = {}
+            if elem['units']:
+                conv_f, new_units = wea_convert(elem['units'], self.units_system)
+                if conv_f is None:
+                    conv_f = lambda x:x
+                ret = [fmt % conv_f(i) for i in ret if i != MISSING]
+
         # Convert data to floats for json serialize
         return array([float(i) for i in ret])
 

@@ -158,6 +158,7 @@ class WeaFile(object):
         # which are DAY and TIM.
         ind = np.where(a[:,2:] < MISSING)  # the index where non-missing are
         last_row = ind[0][-1]
+        # TODO: Convert to requested units_system
         # Convert data to floats to allow json serialize
         data = dict(zip(self.header['pcodes'], [float(i) for i in a[last_row]]))
         return data

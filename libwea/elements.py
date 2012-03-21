@@ -67,6 +67,7 @@ for line in [l.strip() for l in wea_elements2_file.readlines()]:
     # Convert units1 to system by muliplying multiplier and adding
     # offset, resulting in units2
     Conversions[(units1.strip(), system.strip())] = (float(multiplier), float(offset), units2.strip())
+wea_elements2_file.close()
 
 
 """

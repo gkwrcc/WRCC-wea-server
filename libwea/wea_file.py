@@ -45,6 +45,12 @@ class WeaFile(object):
         return self._do_unpack('<h', 2)[0]
 
     def read_header(self):
+        """
+        Read the header of a .wea file and save in self.header.
+        """
+        if self.header:
+            return self.header
+
         if not hasattr(self, 'fd'):
             self._open()
         tr = self._get_short()  # Always 1 ?
@@ -104,6 +110,9 @@ class WeaFile(object):
         After reading header, return where self.fd.tell() should be. In other words,
         how many bytes does the header consume?
         """
+        if not self.header:
+            self.read_header()
+
         size = 0
         size += 2  # tr
         size += 4  # pr

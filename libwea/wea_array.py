@@ -5,6 +5,7 @@ import logging
 
 from numpy import array, nan, zeros
 from wea_file import WeaFile
+from elements import WeaElements, Conversions
 from utils import minutes_diff, round_date, get_next_month
 
 import settings

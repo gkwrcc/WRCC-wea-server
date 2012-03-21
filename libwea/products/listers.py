@@ -6,7 +6,8 @@ import datetime
 from libwea.wea_array import WeaArray
 from libwea.wea_array import WeaFile
 from libwea.meta import WeaMeta
-from libwea.utils import filename_from_yearmonth, datetime_from_DAYTIM
+from libwea.utils import filename_from_yearmonth, \
+    datetime_from_DAYTIM, get_var_units
 import settings
 
 
@@ -50,10 +51,12 @@ def getData(stn, sD, eD):
         'sD': sD.timetuple()[:5],
         'eD': eD.timetuple()[:5],
         'data': {},
+        'units': {},
     }
 
     for var in var_list:
         result['data'][var] = tuple(w.get_var(var))
+        result['units'][var] = get_var_units(var)
 
     return result
 
@@ -86,6 +89,9 @@ def getMostRecentData(stn, eD=None):
     latest_data = wea.latest_data()
     latest_data_dt = datetime_from_DAYTIM(latest_data["DAY"],
                         latest_data["TIM"])
+    units = {}
+    for pcode in latest_data:
+        units[pcode] = get_var_units(pcode)
 
     # Use this to return the common format?, but data
     # will be lists of 1 element, # and datafile is read twice.
@@ -98,7 +104,8 @@ def getMostRecentData(stn, eD=None):
         'fac1': header['fac1'],
         'fac2': header['fac2'],
         'eD': latest_data_dt.timetuple()[:5],
-        'data': latest_data
+        'data': latest_data,
+        'units': units
     }
     return result
 

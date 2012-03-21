@@ -139,3 +139,14 @@ def wea_convert(unit, system="E"):
         mult, offset, units2 = Conversions[(unit, system)]
         return (lambda x: (x*mult)+offset, units2)
     return (None,None)
+
+
+def get_var_units(pcode):
+    """
+    Return the units for the given pcode.
+    """
+    try:
+        elem = WeaElements[pcode]
+        return elem["units"]
+    except KeyError:
+        return None

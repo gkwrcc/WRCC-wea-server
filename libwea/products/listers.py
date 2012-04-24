@@ -6,6 +6,7 @@ import datetime
 from libwea.wea_array import WeaArray
 from libwea.wea_array import WeaFile
 from libwea.meta import WeaMeta
+from libwea.elements import WeaElements, DEFAULT_FORMAT
 from libwea.utils import filename_from_yearmonth, \
     datetime_from_DAYTIM, get_var_units
 import settings
@@ -52,11 +53,23 @@ def getData(stn, sD, eD, units_system='N'):
         'eD': eD.timetuple()[:5],
         'data': {},
         'units': {},
+        'elements': {},
     }
 
     for var in var_list:
-        result['data'][var] = tuple(w.get_var(var))
+        try:
+            fmt = WeaElements[var]['format']
+        except KeyError:
+            fmt = DEFAULT_FORMAT
+        # Populate formatted data
+        result['data'][var] = [fmt % i for i in w.get_var(var)]
+        # Populate units
         result['units'][var] = get_var_units(var, units_system=units_system)
+        # Populate element names
+        try:
+            result['elements'][var] = WeaElements[var]['name']
+        except KeyError:
+            pass
 
     return result
 
@@ -86,7 +99,7 @@ def getMostRecentData(stn, eD=None, units_system='N'):
     wea = WeaFile(os.path.join(settings.DATAPATH, stn, fn))
 
     header = wea.header
-    latest_data = wea.latest_data()
+    latest_data = wea.latest_data()  # TODO: Convert data to units_system
     latest_data_dt = datetime_from_DAYTIM(latest_data["DAY"],
                         latest_data["TIM"])
     units = {}

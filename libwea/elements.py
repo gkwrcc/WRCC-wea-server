@@ -103,5 +103,5 @@ elemunits_file.close()
 
 # Only allow the import of objects listed here:
 __all__ = (
-    'WeaElements', 'Conversions'
+    'WeaElements', 'Conversions', 'DEFAULT_FORMAT'
 )

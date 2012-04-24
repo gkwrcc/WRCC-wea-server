@@ -5,7 +5,7 @@ import logging
 
 from numpy import array, nan, zeros
 from wea_file import WeaFile
-from elements import WeaElements, Conversions
+from elements import WeaElements
 from utils import minutes_diff, round_date, get_next_month, \
     get_var_units, wea_convert
 
@@ -116,20 +116,20 @@ class WeaArray(object):
 
         # Convert units, unless N (native)
         if self.units_system != 'N':
-            fmt = "%f"
+            # Get this element's properties
             try:
                 elem = WeaElements[pcode]
-                fmt = elem['format']
             except KeyError:
                 elem = {}
-            if elem['units']:
-                conv_f, new_units = wea_convert(elem['units'], self.units_system)
-                if conv_f is None:
-                    conv_f = lambda x:x
-                ret = [fmt % conv_f(i) for i in ret if i != MISSING]
 
-        # Convert data to floats for json serialize
-        return array([float(i) for i in ret])
+            # Try to get a conversion function to change units
+            if 'units' in elem and elem['units']:
+                conv_f, new_units = wea_convert(elem['units'], self.units_system)
+                if not conv_f is None:
+                    ret = [conv_f(i) for i in ret if i != MISSING]
+
+        # Return a numpy array
+        return array(ret)
 
 
 if __name__ == '__main__':
@@ -139,4 +139,5 @@ if __name__ == '__main__':
     w = WeaArray('slid',
                  datetime.datetime(2007, 2, 28, 23, 40),
                  datetime.datetime(2008, 3, 1, 0, 20))
+    w.set_units_system("M")
     print w.get_var('AVA')

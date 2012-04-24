@@ -125,7 +125,9 @@ class WeaArray(object):
             if 'units' in elem and elem['units']:
                 conv_f, new_units = wea_convert(elem['units'], self.units_system)
                 if not conv_f is None:
-                    ret = [conv_f(i) for i in ret if i not in settings.MISSINGS]
+                    for i in range(len(ret)):
+                        if not ret[i] in settings.MISSINGS:
+                            ret[i] = conv_f(ret[i])
 
         # Return a numpy array
         return array(ret)

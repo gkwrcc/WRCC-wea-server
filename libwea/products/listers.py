@@ -62,7 +62,13 @@ def getData(stn, sD, eD, units_system='N'):
         except KeyError:
             fmt = DEFAULT_FORMAT
         # Populate formatted data
-        result['data'][var] = [fmt % i for i in w.get_var(var)]
+        data_list = list(w.get_var(var))
+        for i in range(len(data_list)):
+            if data_list[i] in settings.MISSINGS:
+                data_list[i] = None
+            else:
+                data_list[i] = fmt % data_list[i]
+        result['data'][var] = data_list
         # Populate units
         result['units'][var] = get_var_units(var, units_system=units_system)
         # Populate element names

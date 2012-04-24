@@ -67,7 +67,6 @@ class WeaArray(object):
     def get_var(self, pcode, round_start_up=False, round_end_up=False):
         pcode = str(pcode).upper()
         h = self.weafiles[0].header
-        MISSING = 10000000.0  # TODO: Get this from settings?
         for f in self.weafiles:
             assert f.header['oi'] == h['oi']
 
@@ -126,7 +125,7 @@ class WeaArray(object):
             if 'units' in elem and elem['units']:
                 conv_f, new_units = wea_convert(elem['units'], self.units_system)
                 if not conv_f is None:
-                    ret = [conv_f(i) for i in ret if i != MISSING]
+                    ret = [conv_f(i) for i in ret if i not in settings.MISSINGS]
 
         # Return a numpy array
         return array(ret)

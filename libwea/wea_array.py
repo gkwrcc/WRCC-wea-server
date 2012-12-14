@@ -5,7 +5,9 @@ import logging
 
 from numpy import array, nan, zeros
 from wea_file import WeaFile
-from utils import minutes_diff, round_date, get_next_month
+from elements import WeaElements
+from utils import minutes_diff, round_date, get_next_month, \
+    get_var_units, wea_convert
 
 import settings
 
@@ -16,13 +18,17 @@ class WeaArray(object):
     """
     Class that arranges multiple WeaFile objects into a single array.
     """
-    def __init__(self, stn_id, sD, eD):
+    def __init__(self, stn_id, sD, eD, units_system='N'):
         self.data = None
         self.stn_id = str(stn_id).lower()
         self.sD = sD
         self.eD = eD
+        self.units_system = units_system
         self._make_filenames()
         self._load_full_months()
+
+    def set_units_system(self, new_units_system):
+        self.units_system = new_units_system
 
     def _make_filenames(self):
         "Generate the needed data file names based on months requested."
@@ -84,6 +90,8 @@ class WeaArray(object):
         log.debug("minute diff: %s" % md)
         log.debug("num vals: %s" % num_vals)
 
+        # TODO: Use faster array operations instead of
+        # extending a list
         ret = []
         for f in self.weafiles:
             pcodes = list(f.header['pcodes'])
@@ -104,6 +112,24 @@ class WeaArray(object):
             else:
                 # WHAT TO DO IF pcode DOESN'T EXIST??
                 raise
+
+        # Convert units, unless N (native)
+        if self.units_system != 'N':
+            # Get this element's properties
+            try:
+                elem = WeaElements[pcode]
+            except KeyError:
+                elem = {}
+
+            # Try to get a conversion function to change units
+            if 'units' in elem and elem['units']:
+                conv_f, new_units = wea_convert(elem['units'], self.units_system)
+                if not conv_f is None:
+                    for i in range(len(ret)):
+                        if not ret[i] in settings.MISSINGS:
+                            ret[i] = conv_f(ret[i])
+
+        # Return a numpy array
         return array(ret)
 
 
@@ -114,4 +140,5 @@ if __name__ == '__main__':
     w = WeaArray('slid',
                  datetime.datetime(2007, 2, 28, 23, 40),
                  datetime.datetime(2008, 3, 1, 0, 20))
+    w.set_units_system("M")
     print w.get_var('AVA')

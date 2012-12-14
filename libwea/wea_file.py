@@ -18,8 +18,10 @@ class WeaFile(object):
         self.header = {}
         self.data = None
         if readdata:
-            self.fd = open(filename, 'rb')
             self.read_data()
+
+    def _open(self):
+        self.fd = open(self.filename, 'rb')
 
     def __repr__(self):
         return "<WeaFile %s>" % self.filename
@@ -43,6 +45,14 @@ class WeaFile(object):
         return self._do_unpack('<h', 2)[0]
 
     def read_header(self):
+        """
+        Read the header of a .wea file and save in self.header.
+        """
+        if self.header:
+            return self.header
+
+        if not hasattr(self, 'fd'):
+            self._open()
         tr = self._get_short()  # Always 1 ?
         # pr = float Total minutes in this file
         # oi = short Observation Interval (in minutes)
@@ -95,6 +105,26 @@ class WeaFile(object):
 
         return self.header
 
+    def header_size(self):
+        """
+        After reading header, return where self.fd.tell() should be. In other words,
+        how many bytes does the header consume?
+        """
+        if not self.header:
+            self.read_header()
+
+        size = 0
+        size += 2  # tr
+        size += 4  # pr
+        size += 2  # oi
+        size += 2  # ne
+        size += 2  # rgt
+        size += 2  # wsh
+        size += 2 * 8  # unused
+        size += self.header['ne'] * 3  # pcode string
+
+        return size
+
     def read_data(self):
         """
         Read the entire wea file and store in a numpy.array
@@ -102,10 +132,16 @@ class WeaFile(object):
         if self.data is None:
             h = self.read_header()
             ne, pr, oi = h['ne'], h['pr'], h['oi']
-            self.data = array(
-                    self._do_unpack("%df" % ne * (pr / oi),
-                    4 * ne * (pr / oi))
-                ).reshape((pr / oi), ne)
+            self.fd.seek(0)  # reset fd because memmap will do its own offset
+            # Create a memmap array-like object.
+            # TODO: possibly call ndarray.__new__ with this as buffer.
+            self.data = np.memmap(
+                self.fd,
+                dtype=np.dtype('<f4'),  # 32-bit float, little-endian
+                mode='r',  # read-only mode
+                offset=self.header_size(),  # skip these bytes of the header
+                shape=((pr / oi), ne))  # reshape to (num records, num elements)
+
         # Now self.data is an array like the output of readwea2.e
         # self.data[:, 2].min(): the min value of column 2 (same as pcodes[2])
         return self.data
@@ -114,14 +150,17 @@ class WeaFile(object):
         """
         Return a slice of self.data with the most recent, non-missing data.
         """
-        MISSING = 10000000.0
+        MISSING = 10000000.0  # TODO: Get this from settings?
         a = self.data  # use a short reference to data array
+
         # We want to find the last row of data where
         # there is a non-missing value, excluding the first two columns,
         # which are DAY and TIM.
         ind = np.where(a[:,2:] < MISSING)  # the index where non-missing are
         last_row = ind[0][-1]
-        data = dict(zip(self.header['pcodes'], a[last_row]))
+        # TODO: Convert to requested units_system
+        # Convert data to floats to allow json serialize
+        data = dict(zip(self.header['pcodes'], [float(i) for i in a[last_row]]))
         return data
 
 

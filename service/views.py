@@ -42,9 +42,10 @@ def getData(request):
     stn = request.args.get('stn')
     sD = parse_date(request.args.get('sD'))
     eD = parse_date(request.args.get('eD'))
+    units_system = request.args.get('units', 'N')  # N (native) units by default
 
     try:
-        result = getData(stn, sD, eD)
+        result = getData(stn, sD, eD, units_system=units_system)
     except IOError:
         return ErrorResponse("No data available.")
 
@@ -60,9 +61,10 @@ def getDataSingleDay(request):
 
     stn = request.args.get('stn')
     sD = parse_date(request.args.get('sD'))
+    units_system = request.args.get('units', 'N')  # N (native) units by default
 
     try:
-        result = getDataSingleDay(stn, sD)
+        result = getDataSingleDay(stn, sD, units_system=units_system)
     except IOError:
         return ErrorResponse("No data available.")
 
@@ -78,9 +80,10 @@ def getMostRecentData(request):
 
     stn = request.args.get('stn')
     eD = parse_date(request.args.get('eD', None))
+    units_system = request.args.get('units', 'N')  # N (native) units by default
 
     try:
-        result = getMostRecentData(stn, eD)
+        result = getMostRecentData(stn, eD, units_system=units_system)
     except IOError:
         return ErrorResponse("No data available.")
 

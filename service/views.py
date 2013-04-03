@@ -88,3 +88,20 @@ def getMostRecentData(request):
         return ErrorResponse("No data available.")
 
     return JsonResponse(result)
+
+
+@expose('/getStnDates')
+def getStnDates(request):
+    from libwea.products.listers import getStnDates
+    error = require(request, ['stn'])
+    if error:
+        return ErrorResponse(error)
+
+    stn = request.args.get('stn')
+
+    try:
+        result = getStnDates(stn)
+    except IOError:
+        return ErrorResponse("No data available.")
+
+    return JsonResponse(result)

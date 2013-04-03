@@ -130,5 +130,19 @@ def getMostRecentData(stn, eD=None, units_system='N'):
     return result
 
 
+def getStnDates(stn):
+    """
+    Get all elements for the most recent day of data,
+    using eD as the last year/month to search.
+    """
+    stn_meta = WeaMeta(stn)
+    result = {
+        'stn': stn,
+        'dates': stn_meta.get_date_list()
+    }
+    return result
+
+
 if __name__ == '__main__':
-    d = getMostRecentData('nnsc')
+    #d = getMostRecentData('nnsc')
+    d = getStnDates('nnsc')

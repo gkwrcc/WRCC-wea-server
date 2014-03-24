@@ -51,7 +51,7 @@ for line in [l.strip() for l in wea_elements_file.readlines()]:
         continue
     pcode = pcode.strip()
     if not pcode in WeaElements:
-        WeaElements[pcode] = {}
+        WeaElements[pcode] = {}  # noqa
     WeaElements[pcode].update({
         "units": units.strip(),
         "name": desc_long

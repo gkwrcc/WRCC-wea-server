@@ -118,7 +118,7 @@ def datetime_from_DAYTIM(DAY, TIM, year=None):
     and HHMM TIM.
     """
     if year is None:
-        year = datetime.date.today().year
+        year = datetime.date.today().year  # noqa
     ret = datetime.datetime(year, 1, 1) + datetime.timedelta(int(DAY) - 1)
     HHMM = "%04d" % int(TIM)
     hour = int(HHMM[:2])

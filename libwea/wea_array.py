@@ -95,23 +95,28 @@ class WeaArray(object):
         ret = []
         for f in self.weafiles:
             pcodes = list(f.header['pcodes'])
-            if pcode in pcodes:
+            if pcode == 'YEARS':
+                data = f.years
+            elif pcode in pcodes:
                 indx = pcodes.index(pcode)
-                # if only one data file
-                if len(self.weafiles) == 1:
-                    ret.extend(list(f.data[:, indx][s_indx:e_indx + 1]))
-                # if first file
-                elif f == self.weafiles[0]:
-                    ret.extend(list(f.data[:, indx][s_indx:]))
-                # if last file
-                elif f == self.weafiles[-1]:
-                    ret.extend(list(f.data[:, indx][:e_indx + 1]))
-                else:  # use full month
-                    # grab the column from the data array
-                    ret.extend(list(f.data[:, indx]))
+                data = f.data[:, indx]
             else:
                 # WHAT TO DO IF pcode DOESN'T EXIST??
-                raise
+                raise ValueError("'%s' not in pcodes" % (pcode,))
+
+            # Continue by populating ret array with data.
+            # if only one data file, use start and end index.
+            if len(self.weafiles) == 1:
+                ret.extend(list(data[s_indx:e_indx + 1]))
+            # if first file, use start index to the end of the file
+            elif f == self.weafiles[0]:
+                ret.extend(list(data[s_indx:]))
+            # if last file, use start of file to the end index.
+            elif f == self.weafiles[-1]:
+                ret.extend(list(data[:e_indx + 1]))
+            else:  # use full month
+                # grab the column from the data array
+                ret.extend(list(data))
 
         # Convert units, unless N (native)
         if self.units_system != 'N':

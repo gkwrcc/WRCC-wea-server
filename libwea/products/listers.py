@@ -52,6 +52,7 @@ def getData(stn, sD, eD, units_system='N'):
         'sD': sD.timetuple()[:5],
         'eD': eD.timetuple()[:5],
         'data': {},
+        'years': [],
         'units': {},
         'elements': {},
     }
@@ -76,6 +77,8 @@ def getData(stn, sD, eD, units_system='N'):
             result['elements'][var] = WeaElements[var]['name']
         except KeyError:
             pass
+
+    result['years'] = list(w.get_var("years"))
 
     return result
 

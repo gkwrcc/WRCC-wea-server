@@ -6,6 +6,7 @@ import sys
 import numpy as np
 from numpy import array, zeros
 from utils import days_in_month, yearmonth_from_filename
+from ..settings import MISSINGS
 
 
 class WeaFile(object):
@@ -141,6 +142,9 @@ class WeaFile(object):
                 mode='r',  # read-only mode
                 offset=self.header_size(),  # skip these bytes of the header
                 shape=((pr / oi), ne))  # reshape to (num records, num elements)
+            # Store array of years for this data file.
+            year, month = self.yearmonth()
+            self.years = array([year] * (pr / oi))
 
         # Now self.data is an array like the output of readwea2.e
         # self.data[:, 2].min(): the min value of column 2 (same as pcodes[2])

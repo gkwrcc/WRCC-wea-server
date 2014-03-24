@@ -18,7 +18,7 @@ def list_routes(request):
 @expose('/test')
 def test_list(request):
     "An example view"
-    from libwea.products.listers import test_list
+    from wrcc.wea_server.libwea.products.listers import test_list
     stn = request.args.get('stn', None)
     if stn is None:
         return ErrorResponse("'stn' argument required.")
@@ -34,7 +34,7 @@ def test_list(request):
 
 @expose('/getData')
 def getData(request):
-    from libwea.products.listers import getData
+    from wrcc.wea_server.libwea.products.listers import getData
     error = require(request, ['stn', 'sD', 'eD'])
     if error:
         return ErrorResponse(error)
@@ -54,7 +54,7 @@ def getData(request):
 
 @expose('/getDataSingleDay')
 def getDataSingleDay(request):
-    from libwea.products.listers import getDataSingleDay
+    from wrcc.wea_server.libwea.products.listers import getDataSingleDay
     error = require(request, ['stn', 'sD'])
     if error:
         return ErrorResponse(error)
@@ -73,7 +73,7 @@ def getDataSingleDay(request):
 
 @expose('/getMostRecentData')
 def getMostRecentData(request):
-    from libwea.products.listers import getMostRecentData
+    from wrcc.wea_server.libwea.products.listers import getMostRecentData
     error = require(request, ['stn'])
     if error:
         return ErrorResponse(error)
@@ -92,7 +92,7 @@ def getMostRecentData(request):
 
 @expose('/getStnDates')
 def getStnDates(request):
-    from libwea.products.listers import getStnDates
+    from wrcc.wea_server.libwea.products.listers import getStnDates
     error = require(request, ['stn'])
     if error:
         return ErrorResponse(error)

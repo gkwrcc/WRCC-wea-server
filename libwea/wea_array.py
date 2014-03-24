@@ -9,7 +9,7 @@ from elements import WeaElements
 from utils import minutes_diff, round_date, get_next_month, \
     get_var_units, wea_convert
 
-import settings
+from ..settings import DATAPATH, MISSINGS
 
 log = logging.getLogger('WeaArray')
 
@@ -32,7 +32,7 @@ class WeaArray(object):
 
     def _make_filenames(self):
         "Generate the needed data file names based on months requested."
-        base = settings.DATAPATH
+        base = DATAPATH
         filenames = []
         t = self.sD
         while t.timetuple()[:2] <= self.eD.timetuple()[:2]:
@@ -126,7 +126,7 @@ class WeaArray(object):
                 conv_f, new_units = wea_convert(elem['units'], self.units_system)
                 if not conv_f is None:
                     for i in range(len(ret)):
-                        if not ret[i] in settings.MISSINGS:
+                        if not ret[i] in MISSINGS:
                             ret[i] = conv_f(ret[i])
 
         # Return a numpy array

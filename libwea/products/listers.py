@@ -3,13 +3,13 @@
 
 import os
 import datetime
-from libwea.wea_array import WeaArray
-from libwea.wea_array import WeaFile
-from libwea.meta import WeaMeta
-from libwea.elements import WeaElements, DEFAULT_FORMAT
-from libwea.utils import filename_from_yearmonth, \
+from ...libwea.wea_array import WeaArray
+from ...libwea.wea_array import WeaFile
+from ...libwea.meta import WeaMeta
+from ...libwea.elements import WeaElements, DEFAULT_FORMAT
+from ...libwea.utils import filename_from_yearmonth, \
     datetime_from_DAYTIM, get_var_units
-import settings
+from ...settings import MISSINGS, DATAPATH
 
 
 def test_list(stn, sD, eD, var_list=None):
@@ -64,7 +64,7 @@ def getData(stn, sD, eD, units_system='N'):
         # Populate formatted data
         data_list = list(w.get_var(var))
         for i in range(len(data_list)):
-            if data_list[i] in settings.MISSINGS:
+            if data_list[i] in MISSINGS:
                 data_list[i] = None
             else:
                 data_list[i] = fmt % data_list[i]
@@ -102,7 +102,7 @@ def getMostRecentData(stn, eD=None, units_system='N'):
 
     # This may need another level of abstraction?
     fn = filename_from_yearmonth((eD.year, eD.month), stn)
-    wea = WeaFile(os.path.join(settings.DATAPATH, stn, fn))
+    wea = WeaFile(os.path.join(DATAPATH, stn, fn))
 
     header = wea.header
     latest_data = wea.latest_data()  # TODO: Convert data to units_system

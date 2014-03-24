@@ -6,12 +6,12 @@
 import os
 import datetime
 from utils import yearmonth_from_filename, is_valid_filename, days_in_month
-import settings
+from ..settings import DATAPATH
 
 class WeaMeta(object):
     def __init__(self, stn_id):
         self.stn_id = str(stn_id).lower()
-        self.data_dir = os.path.join(settings.DATAPATH, self.stn_id)
+        self.data_dir = os.path.join(DATAPATH, self.stn_id)
 
     def get_date_list(self):
         """

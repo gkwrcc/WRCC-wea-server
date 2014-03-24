@@ -2,7 +2,7 @@
 # WeaBase elements and unit conversions.
 #
 
-import settings
+from ..settings import ELEMENTS_FILE, WEA_ELEMENTS_FILE, WEA_ELEMENTS2_FILE
 
 # Define display formats
 DEFAULT_FORMAT = "%f"
@@ -20,7 +20,7 @@ FORMATS = {
 }
 
 WeaElements = {}
-elements_file = open(settings.ELEMENTS_FILE, 'r')
+elements_file = open(ELEMENTS_FILE, 'r')
 header = elements_file.readline()
 for line in [l.strip() for l in elements_file.readlines()]:
     pcode, name, scale_max, scale_min, unused, fmt = [i.strip() for i in line.split(',')]
@@ -42,7 +42,7 @@ elements_file.close()
 
 
 # Supplement WeaElements with info from wea_elements.dat
-wea_elements_file = open(settings.WEA_ELEMENTS_FILE, 'r')
+wea_elements_file = open(WEA_ELEMENTS_FILE, 'r')
 header = wea_elements_file.readline()
 for line in [l.strip() for l in wea_elements_file.readlines()]:
     try:
@@ -60,7 +60,7 @@ wea_elements_file.close()
 
 
 Conversions = {}
-wea_elements2_file = open(settings.WEA_ELEMENTS2_FILE, 'r')
+wea_elements2_file = open(WEA_ELEMENTS2_FILE, 'r')
 header = wea_elements2_file.readline()
 for line in [l.strip() for l in wea_elements2_file.readlines()]:
     system, units1, units2, multiplier, offset = line.split(',')
@@ -73,7 +73,7 @@ wea_elements2_file.close()
 """
 # These are used for the ingest process. Not sure if needed here.
 WeaConvert = {}
-elemunits_file = open(settings.ELEMUNITS_FILE, 'r')
+elemunits_file = open(ELEMUNITS_FILE, 'r')
 # First read available units
 header = elemunits_file.readline()
 n1 = int(elemunits_file.readline().strip())

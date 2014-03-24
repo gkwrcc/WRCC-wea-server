@@ -18,6 +18,7 @@ class WeaFile(object):
         self.filename = filename
         self.header = {}
         self.data = None
+        self.years = array([])
         if readdata:
             self.read_data()
 

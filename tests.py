@@ -2,6 +2,7 @@ import datetime
 import unittest
 import requests
 import json
+from numpy import array
 from unittest import TestCase
 from libwea.utils import round_date, minutes_diff, days_in_month, is_leap, \
                     is_valid_filename, filename_from_yearmonth, \
@@ -75,9 +76,15 @@ class DatetimeTest(TestCase):
     def testYearMonthFromFile(self):
         for y in range(1940, 2008):
             for m in range(1, 13):
-                filename = "/tmp/nnsc/nnsc%02d%s.wea" % (m, str(y)[-2:])
+                filename = "/tmp/weabase/data/nnsc/nnsc%02d%s.wea" % (m, str(y)[-2:])
                 wea = WeaFile(filename, readdata=False)
                 self.assertEquals((y, m), wea.yearmonth())
+
+    def testYearsArray(self):
+        filename = "/tmp/weabase/data/nnsc/nnsc0112.wea"
+        wea = WeaFile(filename)
+        # Check that all elements are the same.
+        self.assertEquals(wea.years.all(), array([2012,] * 4464).all())
 
     def testNumberElements(self):
         w = WeaArray('nnsc',
@@ -86,6 +93,13 @@ class DatetimeTest(TestCase):
         h = w._last_header()
         self.assertEquals(22, w.get_ne())
         self.assertEquals(len(h['pcodes']), w.get_ne())
+
+    def testYearsWeaArray(self):
+        w = WeaArray('nnsc',
+                     datetime.datetime(2011, 12, 31),
+                     datetime.datetime(2012, 1, 31, 23, 50))
+        years = w.get_var('years')
+        self.assertEquals(len(years), 4608)
 
     def testFullMonth(self):
         w = WeaArray('nnsc',

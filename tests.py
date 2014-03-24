@@ -138,6 +138,27 @@ class DatetimeTest(TestCase):
         result = ["%04d" % i for i in w.get_var('TIM')]
         self.assertEquals(['2340', '2350', '0000', '0010'], result)
 
+    def testUnitsWeaArray(self):
+        # Metric units
+        w = WeaArray('nnsc',
+                     datetime.datetime(2011, 1, 1),
+                     datetime.datetime(2012, 1, 1, 23, 50),
+                     units_system='M')
+        self.assertEquals('M', w.units_system)
+        data = w.get_var('AVA')
+        # Check that the mean temp is calculated correctly.
+        self.assertEquals("10.8", "%.1f" % data.mean())
+
+        # English units
+        w = WeaArray('nnsc',
+                     datetime.datetime(2011, 1, 1),
+                     datetime.datetime(2012, 1, 1, 23, 50),
+                     units_system='E')
+        self.assertEquals('E', w.units_system)
+        data = w.get_var('AVA')
+        # Check that the mean temp is calculated correctly.
+        self.assertEquals("51.5", "%.1f" % data.mean())
+
 
 class OpenFileTest(TestCase):
     def setUp(self):

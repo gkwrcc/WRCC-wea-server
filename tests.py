@@ -191,6 +191,7 @@ class DatetimeTest(TestCase):
         data = wea.latest_data()
         self.assertTrue("DAY" in data)
         self.assertTrue("TIM" in data)
+        self.assertEquals(data["YEAR"], 2012)
         self.assertEquals(data["DAY"], 31.0)
         self.assertEquals(data["TIM"], 2350.0)
 

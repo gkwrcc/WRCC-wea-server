@@ -166,6 +166,9 @@ class WeaFile(object):
         # TODO: Convert to requested units_system
         # Convert data to floats to allow json serialize
         data = dict(zip(self.header['pcodes'], [float(i) for i in a[last_row]]))
+        # Add in the 'YEAR'
+        data['YEAR'] = self.yearmonth()[0]
+
         return data
 
 

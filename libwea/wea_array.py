@@ -130,7 +130,7 @@ class WeaArray(object):
             if 'units' in elem and elem['units']:
                 conv_f, new_units = wea_convert(elem['units'], self.units_system)
                 if not conv_f is None:
-                    for i in range(len(ret)):
+                    for i in xrange(len(ret)):
                         if not ret[i] in MISSINGS:
                             ret[i] = conv_f(ret[i])
 

@@ -80,6 +80,32 @@ class DatetimeTest(TestCase):
                 wea = WeaFile(filename, readdata=False)
                 self.assertEquals((y, m), wea.yearmonth())
 
+    def testReadHeader(self):
+        filename = "/tmp/weabase/data/nnsc/nnsc0112.wea"
+        wea = WeaFile(filename, readdata=False)
+        self.assertFalse(wea.header)  # header no yet read
+        self.assertEquals(wea.header_size(), 96)  # reads header only
+        self.assertTrue(wea.header)
+        self.assertTrue(wea.header is wea.read_header())
+        # Assert header is a dict with these keys/values.
+        expected_header = {
+            'pr': 44640,
+            'rgt': 83,
+            'oi': 10,
+            'fac2': 1,
+            'wsh': 20,
+            'fac1': 6,
+            'tr': 1,
+            'ne': 22,
+            'pcodes': (
+                'DAY', 'TIM', 'RAD', 'MWS',
+                'MVM', 'MWD', 'SDD', 'MXW',
+                'MXA', 'MNA', 'AVA', 'MXR',
+                'MNR', 'AVR', 'ATM', 'PRE',
+                'PTL', 'XBT', 'NBT', 'BAT',
+                'PAN', 'SID')}
+        self.assertDictEqual(wea.header, expected_header)
+
     def testYearsArray(self):
         filename = "/tmp/weabase/data/nnsc/nnsc0112.wea"
         wea = WeaFile(filename)

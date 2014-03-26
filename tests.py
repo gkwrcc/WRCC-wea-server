@@ -185,6 +185,15 @@ class DatetimeTest(TestCase):
         # Check that the mean temp is calculated correctly.
         self.assertEquals("51.5", "%.1f" % data.mean())
 
+    def testLatestData(self):
+        filename = "/tmp/weabase/data/nnsc/nnsc0112.wea"
+        wea = WeaFile(filename)
+        data = wea.latest_data()
+        self.assertTrue("DAY" in data)
+        self.assertTrue("TIM" in data)
+        self.assertEquals(data["DAY"], 31.0)
+        self.assertEquals(data["TIM"], 2350.0)
+
 
 class OpenFileTest(TestCase):
     def setUp(self):

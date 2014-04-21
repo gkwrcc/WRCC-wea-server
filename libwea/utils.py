@@ -155,3 +155,9 @@ def get_var_units(pcode, units_system='N'):
         return elem["units"]
     except KeyError:
         return None
+
+
+def hhmm_to_td(i):
+    "Turn an int HHMM like 2350 into time delta hours=23 minutes=50"
+    s = "%04d" % i
+    return datetime.timedelta(minutes=60 * int(s[:2]) + int(s[2:]))

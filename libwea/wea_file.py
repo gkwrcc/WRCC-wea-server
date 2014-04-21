@@ -2,10 +2,11 @@
 # wea_file
 #
 
-import sys
+import datetime
 import numpy as np
+import sys
 from numpy import array, zeros
-from utils import days_in_month, yearmonth_from_filename
+from utils import days_in_month, yearmonth_from_filename, hhmm_to_td
 from ..settings import MISSINGS
 
 
@@ -150,6 +151,16 @@ class WeaFile(object):
         # Now self.data is an array like the output of readwea2.e
         # self.data[:, 2].min(): the min value of column 2 (same as pcodes[2])
         return self.data
+
+    def get_datetimes(self):
+        if self.data is None:
+            self.read_data()
+        dt = datetime.datetime
+        td = datetime.timedelta
+        year, month = self.yearmonth()
+        dates = [dt(year, 1, 1) + td(days=int(x) - 1) + hhmm_to_td(int(y))
+                for x, y in zip(self.data[:, 0], self.data[:, 1])]
+        return dates
 
     def latest_data(self):
         """

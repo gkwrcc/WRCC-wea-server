@@ -6,7 +6,8 @@ from numpy import array
 from unittest import TestCase
 from libwea.utils import round_date, minutes_diff, days_in_month, is_leap, \
                     is_valid_filename, filename_from_yearmonth, \
-                    datetime_from_DAYTIM, wea_convert, get_var_units
+                    datetime_from_DAYTIM, wea_convert, get_var_units, \
+                    hhmm_to_td
 from libwea.wea_file import WeaFile
 from libwea.wea_array import WeaArray
 from libwea.meta import WeaMeta
@@ -105,6 +106,13 @@ class DatetimeTest(TestCase):
                 'PTL', 'XBT', 'NBT', 'BAT',
                 'PAN', 'SID')}
         self.assertDictEqual(wea.header, expected_header)
+
+    def testDatetimesArray(self):
+        filename = "/tmp/weabase/data/nnsc/nnsc0112.wea"
+        wea = WeaFile(filename)
+        dt_list = wea.get_datetimes()
+        self.assertEquals(datetime.datetime(2012,1,1,0,0), dt_list[0])
+        self.assertEquals(datetime.datetime(2012,1,31,23,50), dt_list[-1])
 
     def testYearsArray(self):
         filename = "/tmp/weabase/data/nnsc/nnsc0112.wea"
@@ -315,6 +323,11 @@ class UtilsTest(TestCase):
         d = json.loads(r.data)
         self.assertTrue("error" in d)
 
+    def test_hhmm_to_td(self):
+        td = datetime.timedelta
+        result = td(hours=23, minutes=50)
+        self.assertEquals(result, hhmm_to_td(2350))
+
 
 class MetaTest(TestCase):
     def setUp(self):
@@ -331,6 +344,7 @@ class MetaTest(TestCase):
             d = datetime.datetime(ym[0], ym[1], 1)
 
     def testLastestMonth(self):
+        # This will fail if latest data files aren't available.
         today = datetime.date.today()
         last_date = self.stn_meta.get_latest_month()
         self.assertEquals(today.year, last_date.year)
